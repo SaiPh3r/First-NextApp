@@ -1,16 +1,38 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { axios } from "axios";
+import React, { useEffect, useState } from "react";
+import {useRouter } from "next/navigation";
+import  axios  from "axios";
 export default function signupPage(){
+const router = useRouter()
 const [user,setUser] = useState({
 email:"",
 password:"",
 username:"",
  })
+
+const [buttondisabled,setbutton] = useState(false);
 const onSignUp = async ()=>{
+  try {
+    const response = await axios.post('/api/users/signUp',user);
+    console.log("signup successfull",response.data);
+    router.push("/login")
+    
+    
+  } catch (error) {
+    console.log("signup failed",error)
+    
+  }
  }
+
+ useEffect(() => {
+  if (user.email.length > 0 && user.password.length > 0 && user.username.length > 0) {
+    setbutton(false);
+  } else {
+    setbutton(true);
+  }
+}, [user]);
+
 return(
 <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
 <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-md">
@@ -30,7 +52,7 @@ return(
     <input id="password" type="password" value={user.password} onChange={(e)=>setUser({...user,password:e.target.value})} placeholder="Password"
       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
   </div>
-  <button onClick={onSignUp} className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer transition duration-200 mb-4">Signup</button>
+  <button  onClick={onSignUp} className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer transition duration-200 mb-4">{buttondisabled?"no signup":"signup"}</button>
   <div className="text-center">
     <Link href="/login" className="text-blue-500 hover:text-blue-700">Already have an account? Login</Link>
   </div>
